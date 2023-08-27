@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Portfolio
+    DashBoard
 {% endblock %}
 
 {% block main %}
-    <h2>Portfolio</h2>
+    <h2>DashBoard</h2>
 
     <table class="table table-bordered table-striped">
         <thead class="thread-light">
@@ -24,19 +24,19 @@
                     <th>{{ stock.symbol }}</td>
                     <th>{{ stock.name }}</td>
                     <th>{{ stock.total_shares }}</td>
-                    <th>{{ stock.price | usd }}</td>
-                    <th>{{ (stock.price * stock.total_shares) | usd  }}</td>
+                    <th>{{ stock.price }}</td>
+                    <th>{{ (stock.price * stock.total_shares) }}</td>
                 </tr>
             {% endfor %}
 
             <tr>
                 <td colspan="4" align="right">Cash</td>
-                <td>{{ cash | usd }}</td>
+                <td>{{ cash }}</td>
             </tr>
 
             <tr>
                 <td colspan="4" align="right">Total Value</td>
-                <td>{{ total_value | usd }}</td>
+                <td>{{ total_value  }}</td>
             </tr>
         </tbody>
     </table>
