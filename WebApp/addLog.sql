@@ -1,0 +1,10 @@
+-- SQLite
+CREATE TABLE log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    symbol TEXT NOT NULL,
+    shares INTEGER NOT NULL,
+    price NUMERIC NOT NULL,
+    timestamp DAYTIME DEFULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
