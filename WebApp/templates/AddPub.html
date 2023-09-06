@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+AddPub
+{% endblock %}
+
+{% block main %}
+<h2>Add publish form</h2>
+
+<form action="/AddPub" method="post">
+    <div class="mb-3">
+        <label for="pubTopic">Topic:</label>
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="pubTopic" placeholder="Write the topic"
+            type="text">
+    </div>
+    <button class="btn btn-primary" type="submit">Add publish point</button>
+</form>
+
+{% endblock %}

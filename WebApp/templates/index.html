@@ -5,21 +5,19 @@
 {% endblock %}
 
 {% block main %}
-    <h2>DashBoard</h2>
+    <h2>suscribtion table</h2>
 
     <table class="table table-bordered table-striped">
         <thead class="thread-light">
             <tr>
-                <th>Symbol</th>
-                <th>Name</th>
-                <th>Shares</th>
-                <th>Price</th>
-                <th>Total Value</th>
+                <th>Sub Topic</th>
+                <th>msg</th>
+                <th>timestamp</th>
             </tr>
         </thead>
 
         <tbody>
-            {% for stock in stocks %}
+            {% for sub in reg_subs %}
                 <tr>
                     <th>{{ stock.symbol }}</td>
                     <th>{{ stock.name }}</td>

@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "formulahendry.vscode-node-red"
+        "formulahendry.vscode-node-red",
+        "alexcvzz.vscode-sqlite"
     ]
 }

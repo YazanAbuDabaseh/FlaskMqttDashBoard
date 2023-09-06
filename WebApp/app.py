@@ -32,19 +32,22 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    """Show portfolio"""
+    """Show publish's and subscribtion's"""
+    
+    # publish
+    
 
     return render_template("index.html")
 
 
-@app.route("/history")
+@app.route("/log")
 @login_required
 def history():
     """Show history of transactions"""
     #get user log
     transactions = db.execute("SELECT * FROM log WHERE user_id = :user_id ORDER BY timestamp DESC", user_id=session["user_id"])
     #render history page
-    return render_template("history.html", transactions=transactions)
+    return render_template("log.html", transactions=transactions)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -147,3 +150,79 @@ def register():
     else:
         return render_template("register.html")
 
+
+@app.route("/AddPub", methods=["GET", "POST"])
+@login_required
+def AddPub():
+    """Add topic to publish to"""
+    # make sure its a post request
+    if request.method == "POST":
+        pubTopic = request.form.get("pubTopic")
+        if not pubTopic:  # check provided topic
+            return apology("provide a topic to publish to")
+
+        # Add publish topic
+        db.execute(
+            "INSERT INTO topics (user_id, type, topic) VALUES(:user_id, :type, :topic)",
+            user_id = session["user_id"],
+            type = "publish",
+            topic = request.form.get("pubTopic"),
+            ) 
+        return redirect("/")
+
+    # if GET render buy page
+    else:
+        return render_template("AddPub.html")
+
+
+@app.route("/EditBroker", methods=["GET", "POST"])
+@login_required
+def EditBroker():
+    """Add Broker """
+    # make sure its a post request
+    if request.method == "POST":
+        EditBroker = request.form.get("EditBroker")
+        EditPort = request.form.get("EditPort")
+        if not EditBroker:  # check provided topic
+            return apology("provide a Broker")
+        elif not EditPort:
+            return apology("provide a Port")
+
+        EditBroker = request.form.get("EditBroker")
+        EditPort = request.form.get("EditPort")
+        # Add publish topic
+        db.execute(
+            "UPDATE users SET broker = :EditBroker, port = :EditPort WHERE id = :user_id",
+            EditBroker=EditBroker,
+            EditPort=EditPort,
+            user_id=session["user_id"],
+        )
+        return redirect("/")
+
+    # if GET render buy page
+    else:
+        return render_template("EditBroker.html")
+
+
+@app.route("/AddSub", methods=["GET", "POST"])
+@login_required
+def AddSub():
+    """Add topic to publish to"""
+    # make sure its a post request
+    if request.method == "POST":
+        pubTopic = request.form.get("subTopic")
+        if not pubTopic:  # check provided topic
+            return apology("provide a topic to subscibe to")
+
+        # Add publish topic
+        db.execute(
+            "INSERT INTO topics (user_id, type, topic) VALUES(:user_id, :type, :topic)",
+            user_id=session["user_id"],
+            type="subscribe",
+            topic=request.form.get("subTopic"),
+        )
+        return redirect("/")
+
+    # if GET render buy page
+    else:
+        return render_template("AddSub.html")

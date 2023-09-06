@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+AddBroker
+{% endblock %}
+
+{% block main %}
+<h2>Add Broker form</h2>
+
+<form action="/EditBroker" method="post">
+    <div class="mb-3">
+        <label for="EditBroker">Broker:</label>
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="EditBroker"
+            placeholder="Broker URL" type="text">
+    </div>
+    <div class="mb-3">
+        <label for="EditPort">Port:</label>
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="EditPort"
+            placeholder="broker port" type="text">
+    </div>
+    <button class="btn btn-primary" type="submit">Set Broker</button>
+</form>
+
+{% endblock %}
