@@ -11,23 +11,19 @@ Log
     <thead class="thread-light">
         <tr>
             <th>Type</th>
-            <th>Symbol</th>
-            <th>Shares</th>
-            <th>Price</th>
-            <th>Total</th>
+            <th>Topic</th>
+            <th>Payload</th>
             <th>Time</th>
         </tr>
     </thead>
 
     <tbody>
-        {% for transaction in transactions %}
+        {% for msg in messagingLog %}
         <tr>
-            <td>{{ transaction.type }}</td>
-            <td>{{ transaction.symbol }}</td>
-            <td>{{ transaction.shares }}</td>
-            <td>{{ transaction.price}}</td>
-            <td>{{ (transaction.price * transaction.shares) }}</td>
-            <td>{{ transaction.timestamp }}</td>
+            <td>{{ msg.type }}</td>
+            <td>{{ msg.topic }}</td>
+            <td>{{ msg.value }}</td>
+            <td>{{ msg.timestamp}}</td>
         </tr>
         {% endfor %}
     </tbody>

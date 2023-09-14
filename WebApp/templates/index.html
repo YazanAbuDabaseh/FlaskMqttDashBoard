@@ -6,7 +6,9 @@
 
 {% block main %}
     <h2>suscribtion table</h2>
-
+    <h3> the path is : {{userPath[0]["path"]}}</h3>
+    <h4> shown last values for each</h4>
+        
     <table class="table table-bordered table-striped">
         <thead class="thread-light">
             <tr>
@@ -17,25 +19,27 @@
         </thead>
 
         <tbody>
-            {% for sub in reg_subs %}
+            {% for sub in subLog %}
                 <tr>
-                    <th>{{ stock.symbol }}</td>
-                    <th>{{ stock.name }}</td>
-                    <th>{{ stock.total_shares }}</td>
-                    <th>{{ stock.price }}</td>
-                    <th>{{ (stock.price * stock.total_shares) }}</td>
+                    <td>{{ userPath[0]["path"] }}/{{ sub.topic }}</td>
+                    <td>{{ sub.value }}</td>
+                    <td>{{ sub.timestamp }}</td>
                 </tr>
             {% endfor %}
-
-            <tr>
-                <td colspan="4" align="right">Cash</td>
-                <td>{{ cash }}</td>
-            </tr>
-
-            <tr>
-                <td colspan="4" align="right">Total Value</td>
-                <td>{{ total_value  }}</td>
-            </tr>
         </tbody>
     </table>
+
+    {% for pub in pubTopics%}
+    <h2>Publish a msg to : {{ userPath[0]["path"] }}/{{ pub.topic }} </h2>
+    
+    <form action="/messagePublish" method="post">
+        <div class="mb-3">
+            <label for="pubTopic">Message:</label>
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="{{ userPath[0]["path"] }}/{{ pub.topic }}"
+                placeholder="Write the Message" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Send Message</button>
+    </form>
+    {% endfor %}
+
 {% endblock %}

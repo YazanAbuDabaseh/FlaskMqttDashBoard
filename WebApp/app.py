@@ -5,6 +5,9 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask import Flask
+from flask_mqtt import Mqtt
+
 
 from helpers import apology, login_required
 
@@ -19,6 +22,16 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///mqtt.db")
 
+app.config['SECRET'] = 'my secret key'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['MQTT_BROKER_URL'] = 'broker.hivemq.com'
+app.config['MQTT_BROKER_PORT'] = 1883
+app.config['MQTT_USERNAME'] = ''
+app.config['MQTT_PASSWORD'] = ''
+app.config['MQTT_KEEPALIVE'] = 5
+app.config['MQTT_TLS_ENABLED'] = False
+
+mqtt = Mqtt(app, connect_async=True)
 
 @app.after_request
 def after_request(response):
@@ -29,25 +42,69 @@ def after_request(response):
     return response
 
 
+@mqtt.on_message()
+def handle_mqtt_message(client, userdata, message):
+    data = {"topic": message.topic, "payload": message.payload.decode()}
+    db.execute(
+        "INSERT INTO messages (topic, message) VALUES(:topic, :messagePayload)",
+        topic=data["topic"],
+        messagePayload=data["payload"],
+    )
+
+
 @app.route("/")
 @login_required
 def index():
     """Show publish's and subscribtion's"""
-    
-    # publish
-    
 
-    return render_template("index.html")
+    #Path
+    userPath = db.execute(
+        "SELECT path FROM users WHERE id = :user_id",
+        user_id=session["user_id"],
+    )
 
+    # publishs
+    pubTopics = db.execute(
+        "SELECT topic FROM topics WHERE (user_id = :user_id AND type = 'publish') ",
+        user_id=session["user_id"],
+    )
+
+    # subscribtions
+    subTopics = db.execute(
+        "SELECT topic FROM topics WHERE (user_id = :user_id AND type = 'subscribe') ",
+        user_id=session["user_id"],
+    )
+
+    print(subTopics)
+
+    for s in subTopics:
+        print(s["topic"])
+        subTopic = userPath[0]["path"] + "/" + s["topic"]
+        print(subTopic)
+        #mqtt.subscribe(subTopic)
+
+    # sub log
+    subLog = db.execute(
+        "SELECT topic, value, timestamp FROM log WHERE (user_id = :user_id AND type = 'subscribe')",
+        user_id=session["user_id"],
+    )
+
+    return render_template(
+        "index.html",
+        userPath=userPath,
+        pubTopics=pubTopics,
+        subTopics=subTopics,
+        subLog=subLog
+        )
 
 @app.route("/log")
 @login_required
 def history():
     """Show history of transactions"""
     #get user log
-    transactions = db.execute("SELECT * FROM log WHERE user_id = :user_id ORDER BY timestamp DESC", user_id=session["user_id"])
+    messagingLog = db.execute("SELECT * FROM log WHERE user_id = :user_id ORDER BY timestamp DESC", user_id=session["user_id"])
     #render history page
-    return render_template("log.html", transactions=transactions)
+    return render_template("log.html", messagingLog=messagingLog)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -226,3 +283,25 @@ def AddSub():
     # if GET render buy page
     else:
         return render_template("AddSub.html")
+
+
+@app.route("/messagePublish", methods=["POST"])
+@login_required
+def messagePublish():
+    """publish a message"""
+    f = request.form
+    timestamp = datetime.datetime.now()
+    for key in f.keys():
+        for value in f.getlist(key):
+            if mqtt.publish(key, value):
+                db.execute(
+                    "INSERT INTO log (user_id, topic, type, value, timestamp) VALUES(:user_id, :topic, :type, :value, :timestamp)",
+                    user_id=session["user_id"],
+                    topic = key,
+                    type = "publish",
+                    value = value,
+                    timestamp=timestamp,
+                )
+                print (key,":",value)
+
+    return redirect("/")
