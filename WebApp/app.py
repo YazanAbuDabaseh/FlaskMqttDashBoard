@@ -75,17 +75,34 @@ def index():
         user_id=session["user_id"],
     )
 
-    print(subTopics)
-
     for s in subTopics:
         print(s["topic"])
         subTopic = userPath[0]["path"] + "/" + s["topic"]
-        print(subTopic)
-        #mqtt.subscribe(subTopic)
+        mqtt.subscribe(subTopic)
+
+    # move incoming messags to log
+
+    incommingMessages = db.execute("SELECT id, topic, message FROM messages")
+
+    for incommingMessage in incommingMessages:
+        for s in subTopics:
+            timestamp = datetime.datetime.now()
+            if incommingMessage["topic"] == s["topic"]:
+                # print(incommingMessage["topic"])
+                db.execute(
+                    "INSERT INTO log (user_id, topic, type, value, timestamp) VALUES(:user_id, :topic, :type, :value, :timestamp)",
+                    user_id=session["user_id"],
+                    type = "subscribe",
+                    topic=incommingMessage["topic"],
+                    value = incommingMessage["message"],
+                    timestamp = timestamp,
+                )
+                #db.execute=(" DELETE FROM messages WHERE id = ?", incommingMessage["id"])
+
 
     # sub log
     subLog = db.execute(
-        "SELECT topic, value, timestamp FROM log WHERE (user_id = :user_id AND type = 'subscribe')",
+        "SELECT topic, value, max(timestamp) as latest FROM log WHERE (user_id = :user_id AND type = 'subscribe')",
         user_id=session["user_id"],
     )
 
