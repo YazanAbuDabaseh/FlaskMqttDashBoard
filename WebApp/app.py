@@ -24,7 +24,7 @@ db = SQL("sqlite:///mqtt.db")
 
 app.config['SECRET'] = 'my secret key'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.config['MQTT_BROKER_URL'] = 'broker.hivemq.com'
+app.config['MQTT_BROKER_URL'] = 'broker.emqx.io'
 app.config['MQTT_BROKER_PORT'] = 1883
 app.config['MQTT_USERNAME'] = ''
 app.config['MQTT_PASSWORD'] = ''
@@ -57,6 +57,9 @@ def handle_mqtt_message(client, userdata, message):
 def index():
     """Show publish's and subscribtion's"""
 
+    #brokerURL = db.execute("SELECT broker, port FROM users WHERE id = :user_id", user_id=session["user_id"],)
+    #app.config['MQTT_BROKER_URL'] = brokerURL
+
     #Path
     userPath = db.execute(
         "SELECT path FROM users WHERE id = :user_id",
@@ -76,7 +79,7 @@ def index():
     )
 
     for s in subTopics:
-        print(s["topic"])
+        # print(s["topic"])
         subTopic = userPath[0]["path"] + "/" + s["topic"]
         mqtt.subscribe(subTopic)
 
@@ -88,7 +91,7 @@ def index():
         for s in subTopics:
             timestamp = datetime.datetime.now()
             if incommingMessage["topic"] == s["topic"]:
-                # print(incommingMessage["topic"])
+                print(incommingMessage["topic"])
                 db.execute(
                     "INSERT INTO log (user_id, topic, type, value, timestamp) VALUES(:user_id, :topic, :type, :value, :timestamp)",
                     user_id=session["user_id"],
@@ -97,7 +100,7 @@ def index():
                     value = incommingMessage["message"],
                     timestamp = timestamp,
                 )
-                #db.execute=(" DELETE FROM messages WHERE id = ?", incommingMessage["id"])
+                db.execute( " DELETE FROM messages WHERE id = ? ", incommingMessage["id"],)
 
 
     # sub log
@@ -242,11 +245,27 @@ def AddPub():
             type = "publish",
             topic = request.form.get("pubTopic"),
             ) 
-        return redirect("/")
+        return redirect("/AddPub")
 
     # if GET render buy page
     else:
-        return render_template("AddPub.html")
+        pubTopics = db.execute(
+            "SELECT topic FROM topics WHERE type = :type",
+            type="publish",
+        )
+        return render_template("AddPub.html", pubTopics=pubTopics)
+
+@app.route("/removePub", methods=["POST"])
+@login_required
+def RemovePub():
+    """remove publsih"""
+    db.execute(
+        "DELETE FROM topics WHERE (topic = :topic AND type = :type AND user_id = :user_id)", 
+        user_id=session["user_id"],
+        type="publish",
+        topic=request.form.get("pubTopic")
+    )
+    return redirect("/AddPub")
 
 
 @app.route("/EditBroker", methods=["GET", "POST"])
@@ -275,7 +294,8 @@ def EditBroker():
 
     # if GET render buy page
     else:
-        return render_template("EditBroker.html")
+        broker = db.execute("SELECT broker, port FROM users WHERE id = :user_id",user_id=session["user_id"],)
+        return render_template("EditBroker.html", broker=broker)
 
 
 @app.route("/AddSub", methods=["GET", "POST"])
@@ -288,18 +308,42 @@ def AddSub():
         if not pubTopic:  # check provided topic
             return apology("provide a topic to subscibe to")
 
-        # Add publish topic
-        db.execute(
-            "INSERT INTO topics (user_id, type, topic) VALUES(:user_id, :type, :topic)",
-            user_id=session["user_id"],
-            type="subscribe",
-            topic=request.form.get("subTopic"),
+        subTopics = db.execute(
+            "SELECT topic FROM topics"
         )
-        return redirect("/")
+        formTopic=request.form.get("subTopic")
+        # Add subscribe topic
+        for subTopics in subTopics:
+            if formTopic == subTopics["topic"]:
+                return apology("Topic already subscibed to")
+
+        db.execute(
+                    "INSERT INTO topics (user_id, type, topic) VALUES(:user_id, :type, :topic)",
+                    user_id=session["user_id"],
+                    type="subscribe",
+                    topic=formTopic,
+                )
+        return redirect("/AddSub")
 
     # if GET render buy page
     else:
-        return render_template("AddSub.html")
+        subTopics = db.execute(
+            "SELECT topic FROM topics WHERE type = :type",
+            type="subscribe",
+        )
+        return render_template("AddSub.html", subTopics=subTopics)
+
+@app.route("/removeSub", methods=["POST"])
+@login_required
+def RemoveSub():
+    """remove subscribtion"""
+    db.execute(
+        "DELETE FROM topics WHERE (topic = :topic AND type = :type AND user_id = :user_id)", 
+        user_id=session["user_id"],
+        type="subscribe",
+        topic=request.form.get("subTopic")
+    )
+    return redirect("/AddSub")
 
 
 @app.route("/messagePublish", methods=["POST"])

@@ -31,10 +31,10 @@
                 <div class="collapse navbar-collapse" id="navbar">
                     {% if session["user_id"] %}
                         <ul class="navbar-nav me-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/AddSub">AddSub</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/AddPub">AddPub</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/AddSub">Subscribtions</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/AddPub">Publishs</a></li>
                             <li class="nav-item"><a class="nav-link" href="/log">Log</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/EditBroker">EditBroker</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/EditBroker">Broker</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
@@ -60,10 +60,6 @@
         <main class="container-fluid py-5 text-center">
             {% block main %}{% endblock %}
         </main>
-
-        <footer class="mb-5 small text-center text-muted">
-            Data provided by <a href="https://iexcloud.io/">IEX</a>
-        </footer>
 
     </body>
 

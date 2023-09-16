@@ -6,6 +6,8 @@ AddBroker
 
 {% block main %}
 <h2>Add Broker form</h2>
+<h3>Current broker is: {{ broker[0]["broker"] }}</h3>
+<h3>Current port is: {{ broker[0]["port"] }}</h3>
 
 <form action="/EditBroker" method="post">
     <div class="mb-3">

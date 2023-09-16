@@ -16,4 +16,32 @@ AddSub
     <button class="btn btn-primary" type="submit">Add subscribtion point</button>
 </form>
 
+<div>
+    <table class="table table-bordered table-striped">
+        <thead class="thread-light">
+            <tr>
+                <th>Subscribed Topics</th>
+            </tr>  
+        </thead>
+        <tbody>
+            {% for topic in subTopics %}
+                <tr>
+                    <td>{{ topic["topic"] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2>remove subscribtion form</h2>
+
+<form action="/removeSub" method="post">
+    <div class="mb-3">
+        <label for="subTopic">Topic:</label>
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="subTopic"
+            placeholder="Write the topic" type="text">
+    </div>
+    <button class="btn btn-primary" type="submit">remove subscribtion point</button>
+</form>
+
 {% endblock %}

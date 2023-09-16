@@ -16,4 +16,32 @@ AddPub
     <button class="btn btn-primary" type="submit">Add publish point</button>
 </form>
 
+<div>
+    <table class="table table-bordered table-striped">
+        <thead class="thread-light">
+            <tr>
+                <th>Publsih Topics</th>
+            </tr>  
+        </thead>
+        <tbody>
+            {% for topic in pubTopics %}
+                <tr>
+                    <td>{{ topic["topic"] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2>remove publish form</h2>
+
+<form action="/removePub" method="post">
+    <div class="mb-3">
+        <label for="pubTopic">Topic:</label>
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="pubTopic" placeholder="Write the topic"
+            type="text">
+    </div>
+    <button class="btn btn-primary" type="submit">remove publish point</button>
+</form>
+
 {% endblock %}
