@@ -8,6 +8,7 @@ import uuid
 from paho.mqtt import client as mqtt_client
 import random
 import time
+import string
 
 
 from flask import redirect, render_template, session
@@ -122,3 +123,10 @@ def publish(client, topic, msg):
         msg_count += 1
         if msg_count > 5:
             break
+
+
+def get_random_string(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return (result_str)

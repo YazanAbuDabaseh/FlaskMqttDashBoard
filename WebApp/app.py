@@ -9,7 +9,7 @@ from flask import Flask
 from flask_mqtt import Mqtt
 
 
-from helpers import apology, login_required
+from helpers import apology, login_required, get_random_string
 
 # Configure application
 app = Flask(__name__)
@@ -79,7 +79,7 @@ def index():
     )
 
     for s in subTopics:
-        # print(s["topic"])
+        # print(userPath[0]["path"] + "/" + s["topic"])
         subTopic = userPath[0]["path"] + "/" + s["topic"]
         mqtt.subscribe(subTopic)
 
@@ -90,7 +90,7 @@ def index():
     for incommingMessage in incommingMessages:
         for s in subTopics:
             timestamp = datetime.datetime.now()
-            if incommingMessage["topic"] == s["topic"]:
+            if incommingMessage["topic"] == (userPath[0]["path"] + "/" +s["topic"]):
                 print(incommingMessage["topic"])
                 db.execute(
                     "INSERT INTO log (user_id, topic, type, value, timestamp) VALUES(:user_id, :topic, :type, :value, :timestamp)",
@@ -105,7 +105,7 @@ def index():
 
     # sub log
     subLog = db.execute(
-        "SELECT topic, value, max(timestamp) as latest FROM log WHERE (user_id = :user_id AND type = 'subscribe')",
+        "SELECT topic, value, MAX(timestamp) as latest FROM log WHERE (user_id = :user_id AND type = 'subscribe') GROUP BY topic",
         user_id=session["user_id"],
     )
 
@@ -210,9 +210,10 @@ def register():
 
         # add new username
         db.execute(
-            "INSERT INTO users (username, hash) VALUES (?, ?)",
+            "INSERT INTO users (username, hash, path) VALUES (?, ?, ?)",
             request.form.get("username"),
             generate_password_hash(request.form.get("password")),
+            (request.form.get("username") + "PATH" + get_random_string(8) ),
         )
 
         # login
