@@ -105,7 +105,7 @@ def index():
 
     # sub log
     subLog = db.execute(
-        "SELECT topic, value, MAX(timestamp) as latest FROM log WHERE (user_id = :user_id AND type = 'subscribe') GROUP BY topic",
+        "SELECT topic, value, timestamp FROM log WHERE (user_id = :user_id AND type = 'subscribe') GROUP BY topic",
         user_id=session["user_id"],
     )
 
@@ -251,8 +251,9 @@ def AddPub():
     # if GET render buy page
     else:
         pubTopics = db.execute(
-            "SELECT topic FROM topics WHERE type = :type",
+            "SELECT topic FROM topics WHERE type = :type AND user_id = :user_id" ,
             type="publish",
+            user_id=session["user_id"],
         )
         return render_template("AddPub.html", pubTopics=pubTopics)
 
@@ -329,8 +330,9 @@ def AddSub():
     # if GET render buy page
     else:
         subTopics = db.execute(
-            "SELECT topic FROM topics WHERE type = :type",
+            "SELECT topic FROM topics WHERE type = :type AND user_id = :user_id",
             type="subscribe",
+            user_id=session["user_id"],
         )
         return render_template("AddSub.html", subTopics=subTopics)
 
