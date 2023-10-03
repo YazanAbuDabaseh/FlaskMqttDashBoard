@@ -57,9 +57,6 @@ def handle_mqtt_message(client, userdata, message):
 def index():
     """Show publish's and subscribtion's"""
 
-    #brokerURL = db.execute("SELECT broker, port FROM users WHERE id = :user_id", user_id=session["user_id"],)
-    #app.config['MQTT_BROKER_URL'] = brokerURL
-
     #Path
     userPath = db.execute(
         "SELECT path FROM users WHERE id = :user_id",
@@ -270,34 +267,11 @@ def RemovePub():
     return redirect("/AddPub")
 
 
-@app.route("/EditBroker", methods=["GET", "POST"])
+@app.route("/ShowBroker", methods=["GET"])
 @login_required
-def EditBroker():
-    """Add Broker """
-    # make sure its a post request
-    if request.method == "POST":
-        EditBroker = request.form.get("EditBroker")
-        EditPort = request.form.get("EditPort")
-        if not EditBroker:  # check provided topic
-            return apology("provide a Broker")
-        elif not EditPort:
-            return apology("provide a Port")
-
-        EditBroker = request.form.get("EditBroker")
-        EditPort = request.form.get("EditPort")
-        # Add publish topic
-        db.execute(
-            "UPDATE users SET broker = :EditBroker, port = :EditPort WHERE id = :user_id",
-            EditBroker=EditBroker,
-            EditPort=EditPort,
-            user_id=session["user_id"],
-        )
-        return redirect("/")
-
-    # if GET render buy page
-    else:
-        broker = db.execute("SELECT broker, port FROM users WHERE id = :user_id",user_id=session["user_id"],)
-        return render_template("EditBroker.html", broker=broker)
+def ShowBroker():
+    """show Broker """
+    return render_template("ShowBroker.html", broker=app.config['MQTT_BROKER_URL'], port=app.config['MQTT_BROKER_PORT'] )
 
 
 @app.route("/AddSub", methods=["GET", "POST"])
