@@ -5,7 +5,7 @@ AddSub
 {% endblock %}
 
 {% block main %}
-<h2>Add subscribtion form</h2>
+<h2>Add subscription form</h2>
 
 <form action="/AddSub" method="post">
     <div class="mb-3">
@@ -13,14 +13,14 @@ AddSub
         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="subTopic"
             placeholder="Write the topic" type="text">
     </div>
-    <button class="btn btn-primary" type="submit">Add subscribtion point</button>
+    <button class="btn btn-primary" type="submit">Add subscription point</button>
 </form>
 
 <div>
     <table class="table table-bordered table-striped">
         <thead class="thread-light">
             <tr>
-                <th>Subscribed Topics</th>
+                <th>Subscriped Topics</th>
             </tr>  
         </thead>
         <tbody>
@@ -33,7 +33,7 @@ AddSub
     </table>
 </div>
 
-<h2>remove subscribtion form</h2>
+<h2>remove subscription form</h2>
 
 <form action="/removeSub" method="post">
     <div class="mb-3">
@@ -41,7 +41,7 @@ AddSub
         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="subTopic"
             placeholder="Write the topic" type="text">
     </div>
-    <button class="btn btn-primary" type="submit">remove subscribtion point</button>
+    <button class="btn btn-primary" type="submit">remove subscription point</button>
 </form>
 
 {% endblock %}

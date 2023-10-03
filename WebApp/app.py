@@ -235,6 +235,18 @@ def AddPub():
         pubTopic = request.form.get("pubTopic")
         if not pubTopic:  # check provided topic
             return apology("provide a topic to publish to")
+        
+        pubTopics = db.execute(
+            "SELECT topic FROM topics WHERE user_id = :user_id and type = :type",
+            user_id=session["user_id"],
+            type="publish",
+        )
+
+        # Add subscribe topic
+        for pubTopics in pubTopics:
+            if pubTopic == pubTopics["topic"]:
+                return apology("Topic already used")
+
 
         # Add publish topic
         db.execute(
@@ -280,14 +292,16 @@ def AddSub():
     """Add topic to publish to"""
     # make sure its a post request
     if request.method == "POST":
-        pubTopic = request.form.get("subTopic")
-        if not pubTopic:  # check provided topic
+        formTopic = request.form.get("subTopic")
+        if not formTopic:  # check provided topic
             return apology("provide a topic to subscibe to")
 
         subTopics = db.execute(
-            "SELECT topic FROM topics"
+            "SELECT topic FROM topics WHERE user_id = :user_id and type = :type",
+            user_id=session["user_id"],
+            type="subscribe",
         )
-        formTopic=request.form.get("subTopic")
+
         # Add subscribe topic
         for subTopics in subTopics:
             if formTopic == subTopics["topic"]:
